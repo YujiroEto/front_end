@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<title>神経衰弱ゲーム</title>
+		<style>
+			input {
+				font-size: 18px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>神経衰弱ゲーム</h1>
+		<p>Score: <span id="score"></span></p>
+		<input type="button" id="card_0" value="?" onclick="flip(0);">
+		<input type="button" id="card_1" value="?" onclick="flip(1);"><br>
+		<input type="button" id="card_2" value="?" onclick="flip(2);">
+		<input type="button" id="card_3" value="?" onclick="flip(3);">
+		<script>
+			// 0 0 1 1 -> cards[0..3]
+
+			var cards = [],
+			CARD_NUM = 4,
+			currentNum, // 0 or 1
+			openedCard, // 0 .. 3
+			correctNum = 0,
+			enableFlip = true,
+			score = 0,
+			timerId;
+
+			function flip(n) {
+				if (!enableFlip) {
+					return;
+				}
+				var card = document.getElementById('card_'+n);
+				if (card.value != '?') {
+					return;
+				}
+				card.value = cards[n];
+				if (typeof currentNum === 'undefined') {
+					// 1枚目！
+					openedCard = n;
+					currentNum = cards[n];
+					} else {
+					// 2枚目
+					// 判定
+					judge(n);
+					currentNum = undefined;
+				}
+			}
+
+			function judge(n) {
+				if (currentNum ==  cards[n]) {
+					// 正解処理！
+					correctNum++;
+					if (correctNum ==  CARD_NUM / 2) {
+
+						alert("your score is .." + document.getElementById('score').innerHTML);
+					}
+					} else {
+					// 不正解！
+					enableFlip = false;
+					setTimeout(function() {
+						document.getElementById('card_'+openedCard).value = '?';
+						document.getElementById('card_'+n).value = '?';
+						enableFlip = true;
+					}, 700);
+				}
+			}
+
+			function initCards() {
+				var num,
+				cardIndex;
+				for (var i = 0; i < CARD_NUM; i++) {
+					num = Math.floor(i / 2);
+					do {
+						cardIndex = Math.floor(Math.random() * CARD_NUM);
+					} while(typeof cards[cardIndex] !==  'undefined');
+					cards[cardIndex] = num;
+				}
+				console.log(cards);
+			}
+
+			function runTimer() {
+				document.getElementById('score').innerHTML = score++;
+				timerId = setTimeout(function () {
+					runTimer();
+				}, 10);
+			}
+
+			initCards();
+			runTimer();
+		</script>
+	</body>
+</html>
