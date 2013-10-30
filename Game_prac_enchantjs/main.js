@@ -1,160 +1,196 @@
-// class作成
 enchant();
-
-/*
- *  
- *  Core
- *  - rootScene
- *  -- Sprite (bear)
- *   
- *   */
 
 window.onload = function() {
 
 	var core = new Core(320, 320);
-	core.preload('chara1.png');
+	core.preload('chara1.png', 'map1.png');
 	core.fps = 15;
 	core.onload = function() {
 
-		/*
-		   var bear = new Sprite(32, 32);
-		   bear.image = core.assets['chara1.png'];
-		   bear.x = 0;
-		   bear.y = 0;        
-		   bear.addEventListener('enterframe', function() {
-		   if (core.input.right) this.x += 5;
-		   });
-		   core.rootScene.addChild(bear);
-		   */
-		var Bear = Class.create(Sprite, {
-			initialize: function(x, y) {
-				Sprite.call(this, 32, 32);
-				this.x = x;
-				this.y = y;
-				this.frame = rand(5);
-				this.opacity = rand(100) / 100;
-				this.image = core.assets['chara1.png'];
+		var bear = new Sprite(32, 32);
+		bear.image = core.assets['chara1.png'];
+		bear.x = 0;
+		bear.y = 0;
 
-				this.tl.moveBy(rand(100), 0, 40, enchant.Easing.BOUNCE_EASEOUT)
-			.moveBy(-rand(100), -rand(20), rand(20))
-			.fadeOut(20)
-			.fadeIn(10)
-			.loop();
+		bear.addEventListener('enterframe', function() {
 
-		core.rootScene.addChild(this);
-			}        
+			//動作
+			if (core.input.left) 	{
+				this.x -= 5;
+        		if(map.hitTest(this.x + 16, this.y + 40)) this.x += 5;
+				this.frame = this.age % 3;
+				this.age ++;
+			}
+
+			if (core.input.right) 	{
+				this.x += 5;
+        		if(map.hitTest(this.x + 24 , this.y + 40)) this.x -= 5;
+				this.frame = this.age % 3;
+				this.age ++;
+			}
+
+			if (core.input.up) 	{
+				this.y -= 5;
+        		if(map.hitTest(this.x + 24, this.y + 40)) this.y += 5;
+				this.frame = this.age % 3;
+				this.age ++;
+			}
+
+			if (core.input.down) 	{
+				this.y += 5;
+        		if(map.hitTest(this.x + 24, this.y + 40)) this.y -= 5;
+				this.frame = this.age % 3;
+				this.age ++;
+			}
+
+			/*
+			// within もしくは instersectでも可能
+			if (this.within(enemy, 10)) {
+				label.text = 'HIT!';
+				core.pushScene(gameOverScene);
+				core.stop();
+			}
+			*/
+
 		});
 
-		var bears = [];
-		for (var i = 0; i < 100; i++) {
-			bears[i] = new Bear(rand(320), rand(320));
-		}
+
+		/*
+		// touchしたら消える
+		bear.on('touchstart', function() {
+			core.rootScene.removeChild(this);
+		});
+		*/
+
+		/*
+		// touchしたらそこに移動
+		core.rootScene.on('touchstart', function(e) {
+			bear.x = e.x;
+			bear.y = e.y;
+		});
+		*/
+		
+		/*
+		// 2体目
+		var enemy = new Sprite(32, 32);
+		enemy.image = core.assets['chara1.png'];
+		enemy.x = 80;
+		enemy.y = 0;
+		enemy.frame = 5;
+
+		core.rootScene.addChild(enemy);
+		*/
+
+		/*
+		// gameorver
+		var gameOverScene = new Scene();
+		gameOverScene.backgroundColor = 'black';
+		*/
+
+		/*
+		// text
+		var label  =  new Label();
+		label.x  =  300;
+		label.y  =  5;
+		label.color  =  'red';
+		label.font  =  '14px "Arial"';
+		label.text  =  '0';
+		label.on('enterframe', function() {
+			label.text  =  (core.frame / core.fps).toFixed(2);
+		});
+
+		core.rootScene.addChild(label);
+		*/
+		
+    	// バーチャルパッドを作成する
+    	var pad = new Pad();
+    	pad.x = 220; // 表示位置のx座標を設定する
+    	pad.y = 220; // 表示位置のy座標を設定する
+
+		// Map を作って描画する
+		var map = new Map(16, 16);
+		map.image = core.assets['map1.png'];
+
+    	// マップデータ(タイルの並びを表す2次元配列)
+    	map.loadData([
+    	  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,83,84,84,84,84,84,84,84,84,84,84,84],
+    	  [1,1,1,1,1,1,1,1,99,100,116,116,116,116,116,116,116,116,116,116],
+    	  [1,1,1,1,1,16,17,18,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,32,33,34,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,48,49,50,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,20,20,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,16,18,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,48,50,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1],
+    	  [1,1,1,1,1,1,1,1,99,101,1,1,1,1,1,1,1,1,1,1]
+    	],
+    	[
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,28,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,28,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,28,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,28,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,28,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,7,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,7,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,23,23,23,23,23,23,-1,-1,-1],
+    	  [-1,23,23,23,7,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,7,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,28,-1,-1,-1],
+    	  [-1,-1,-1,-1,23,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,28,-1,-1,-1,-1,-1,-1,-1,-1,28,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,28,-1],
+    	  [-1,28,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    	  [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
+    	]);
+    	// マップの当たり判定データ(タイルが当たり判定を持つかを表す2次元配列)
+    	map.collisionData = [
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0],
+    	  [0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    	  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    	]
+ 
+    	// rootSceneにマップを追加する
+    	core.rootScene.addChild(map);
+ 
+		// bear表示
+		core.rootScene.addChild(bear);
+
+    	// rootSceneにバーチャルパッドをを追加する
+    	core.rootScene.addChild(pad);
 
 	}
 	core.start();
 
 };
 
-function rand(n) {
-	return Math.floor(Math.random() * (n+1));
-}
-
-
-
-//enchant();
-//
-//window.onload = function() {
-//
-//	var core = new Core(320, 320);
-//	core.preload('chara1.png');
-//	core.fps = 15;
-//	core.onload = function() {
-//
-//		var bear = new Sprite(32, 32);
-//		bear.image = core.assets['chara1.png'];
-//		bear.x = 0;
-//		bear.y = 0;
-//		// bear.frame = 1;
-//
-//		bear.addEventListener('enterframe', function() {
-//			if (core.input.right) this.x += 5;
-//
-//			// instersect
-//			if (this.intersect(enemy)) {
-//				// label.text = 'hit!';
-//			}
-//			
-//			// within
-//			if (this.within(enemy, 10)) {
-//				// label.text = 'HIT!';
-//				core.pushScene(gameOverScene);
-//				core.stop();
-//			}
-//
-//
-//
-//			/*
-//			//動作
-//			if (core.input.left) this.x -= 5;
-//			if (core.input.right) this.x += 5;
-//			if (core.input.up) this.y -= 5;
-//			if (core.input.down) this.y += 5;
-//			//this.x += 5;						// 動作
-//			//this.frame = this.age % 3 + 5;	// 画像切替
-//			//if (this.x > 320) this.x = 0;		// 画面区切り
-//			//this.rotate(2);					// 回転
-//			//this.scale(1.01, 1.01);			// 徐々に拡大
-//			*/
-//
-//		});
-//
-//		/*
-//		// touchしたら消える
-//		bear.on('touchstart', function() {
-//			core.rootScene.removeChild(this);
-//		});
-//		*/
-//
-//		/*
-//		// touchしたらそこに移動
-//		core.rootScene.on('touchstart', function(e) {
-//			bear.x = e.x;
-//			bear.y = e.y;
-//		});
-//		*/
-//		
-//		// 2体目
-//		var enemy = new Sprite(32, 32);
-//		enemy.image = core.assets['chara1.png'];
-//		enemy.x = 80;
-//		enemy.y = 0;
-//		enemy.frame = 5;
-//
-//		// gameorver
-//		var gameOverScene = new Scene();
-//		gameOverScene.backgroundColor = 'black';
-//
-//		// text
-//		var label = new Label();
-//		label.x = 300;
-//		label.y = 5;
-//		label.color = 'red';
-//		label.font = '14px "Arial"';
-//
-//		/*
-//		label.text = '0';
-//
-//		label.on('enterframe', function() {
-//			label.text = core.frame;	
-//		});
-//		*/
-//
-//		core.rootScene.addChild(label);
-//		core.rootScene.addChild(enemy);
-//		core.rootScene.addChild(bear);
-//
-//	}
-//	core.start();
-//
-//};
-//
